@@ -1,8 +1,7 @@
-﻿using BlazorApplicationInsights.Models;
+﻿namespace BlazorApplicationInsights.Interfaces;
+using BlazorApplicationInsights.Models;
 using System.ComponentModel;
 using System.Threading.Tasks;
-
-namespace BlazorApplicationInsights.Interfaces;
 
 /// <summary>
 /// Dependencies Plugin

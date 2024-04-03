@@ -1,12 +1,18 @@
-﻿using BlazorApplicationInsights.Models;
+﻿namespace BlazorApplicationInsights.Interfaces;
+
+using BlazorApplicationInsights.Models;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace BlazorApplicationInsights.Interfaces;
-
+/// <summary>
+/// 
+/// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
 [Browsable(false)]
-public interface IPropertiesPlugin
-{
-    Task<TelemetryContext> Context();
+public interface IPropertiesPlugin {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	Task<TelemetryContext> Context();
 }

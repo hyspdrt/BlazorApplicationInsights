@@ -1,7 +1,11 @@
 ﻿@namespace BlazorApplicationInsights
+@using BlazorApplicationInsights.Interfaces
+@using Microsoft.JSInterop
+@inject IApplicationInsights ApplicationInsights
+@inject IJSRuntime JSRuntime
+@inject ApplicationInsightsInitConfig Config
 
-@if (!IsWasmStandalone)
-{
-    @((MarkupString)script)
-    <script src="_content/BlazorApplicationInsights/BlazorApplicationInsights.lib.module.js"></script>
+@if (!IsWasmStandalone) {
+	@((MarkupString)Script)
+	<script src="_content/BlazorApplicationInsights/BlazorApplicationInsights.lib.module.js"></script>
 }

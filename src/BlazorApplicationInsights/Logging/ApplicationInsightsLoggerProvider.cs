@@ -1,107 +1,100 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿// ReSharper disable once CheckNamespace
+namespace BlazorApplicationInsights;
 using BlazorApplicationInsights.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-// ReSharper disable once CheckNamespace
-namespace BlazorApplicationInsights;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 /// <summary>LoggerProvider implementation for logging to Application Insights in Blazor Client-Side (WASM) applications</summary>
 [PublicAPI]
-public class ApplicationInsightsLoggerProvider : ILoggerProvider, ISupportExternalScope
-{
-    private readonly IApplicationInsights _applicationInsights;
-    private readonly ConcurrentDictionary<string, ApplicationInsightsLogger> _loggers = new ConcurrentDictionary<string, ApplicationInsightsLogger>();
-    private readonly IDisposable _optionsReloadToken;
-    private Action<Dictionary<string, object?>> _enrichmentCallback = delegate { };
-    private IExternalScopeProvider? _scopeProvider;
-    private ApplicationInsightsLoggerOptions _options = new ApplicationInsightsLoggerOptions();
-    private bool _isDisposed;
+public class ApplicationInsightsLoggerProvider : ILoggerProvider, ISupportExternalScope {
 
-    /// <summary>Initializes a new instance of the <see cref="ApplicationInsightsLoggerProvider"/> class</summary>
-    /// <param name="applicationInsights">Instance to use for transmitting logging messages</param>
-    public ApplicationInsightsLoggerProvider(IApplicationInsights applicationInsights)
-    {
-        _applicationInsights = applicationInsights;
-        _optionsReloadToken = NoOpDisposable.Instance;
-    }
+	private readonly IApplicationInsights _applicationInsights;
+	private readonly ConcurrentDictionary<string, ApplicationInsightsLogger> _loggers = new ConcurrentDictionary<string, ApplicationInsightsLogger>();
+	private readonly IDisposable? _optionsReloadToken;
+	private Action<Dictionary<string, object?>> _enrichmentCallback = delegate { };
+	private IExternalScopeProvider? _scopeProvider;
+	private ApplicationInsightsLoggerOptions _options = new ApplicationInsightsLoggerOptions();
+	private bool _isDisposed;
 
-    /// <summary>Initializes a new instance of the <see cref="ApplicationInsightsLoggerProvider"/> class</summary>
-    /// <param name="applicationInsights">Instance to use for transmitting logging messages</param>
-    /// <param name="options">Logger options</param>
-    [ActivatorUtilitiesConstructor]
-    public ApplicationInsightsLoggerProvider(IApplicationInsights applicationInsights, IOptionsMonitor<ApplicationInsightsLoggerOptions> options)
-    {
-        _applicationInsights = applicationInsights;
-        _optionsReloadToken = options.OnChange(ReloadOptions);
-        ReloadOptions(options.CurrentValue);
-    }
+	/// <summary>Initializes a new instance of the <see cref="ApplicationInsightsLoggerProvider"/> class</summary>
+	/// <param name="applicationInsights">Instance to use for transmitting logging messages</param>
+	public ApplicationInsightsLoggerProvider(IApplicationInsights applicationInsights) {
+		this._applicationInsights = applicationInsights;
+		this._optionsReloadToken = NoOpDisposable.Instance;
+	}
 
-    /// <inheritdoc />
-    public ILogger CreateLogger(string categoryName) =>
-        _loggers.GetOrAdd(categoryName, CreateLoggerInstance);
+	/// <summary>Initializes a new instance of the <see cref="ApplicationInsightsLoggerProvider"/> class</summary>
+	/// <param name="applicationInsights">Instance to use for transmitting logging messages</param>
+	/// <param name="options">Logger options</param>
+	[ActivatorUtilitiesConstructor]
+	public ApplicationInsightsLoggerProvider(IApplicationInsights applicationInsights, IOptionsMonitor<ApplicationInsightsLoggerOptions> options) {
+		this._applicationInsights = applicationInsights;
+		this._optionsReloadToken = options.OnChange(this.ReloadOptions);
+		this.ReloadOptions(options.CurrentValue);
+	}
 
-    /// <inheritdoc />
-    public void SetScopeProvider(IExternalScopeProvider scopeProvider)
-    {
-        _scopeProvider = scopeProvider;
+	/// <inheritdoc />
+	public ILogger CreateLogger(string categoryName) =>
+		this._loggers.GetOrAdd(categoryName, this.CreateLoggerInstance);
 
-        foreach (var logger in _loggers.Values)
-            logger.ScopeProvider = scopeProvider;
-    }
+	/// <inheritdoc />
+	public void SetScopeProvider(IExternalScopeProvider scopeProvider) {
+		this._scopeProvider = scopeProvider;
 
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (_isDisposed)
-            return;
+		foreach (var logger in this._loggers.Values) {
+			logger.ScopeProvider = scopeProvider;
+		}
+	}
 
-        _isDisposed = true;
-        _optionsReloadToken.Dispose();
-    }
+	/// <inheritdoc />
+	public void Dispose() {
+		GC.SuppressFinalize(this);
+		if (this._isDisposed) {
+			return;
+		}
 
-    private ApplicationInsightsLogger CreateLoggerInstance(string categoryName)
-    {
-        return new ApplicationInsightsLogger(categoryName, _applicationInsights)
-        {
-            ScopeProvider = GetScopeProvider(),
-            IncludeScopes = _options.IncludeScopes,
-            IncludeCategoryName = _options.IncludeCategoryName,
+		this._isDisposed = true;
+		this._optionsReloadToken?.Dispose();
+	}
+
+	private ApplicationInsightsLogger CreateLoggerInstance(string categoryName) {
+		return new ApplicationInsightsLogger(categoryName, this._applicationInsights) {
+			ScopeProvider = this.GetScopeProvider(),
+			IncludeScopes = this._options.IncludeScopes,
+			IncludeCategoryName = this._options.IncludeCategoryName,
 
 #pragma warning disable 618
-            EnrichmentCallback = _enrichmentCallback
+			EnrichmentCallback = this._enrichmentCallback
 #pragma warning restore 618
-        };
-    }
+		};
+	}
 
-    private IExternalScopeProvider GetScopeProvider()
-    {
-        _scopeProvider ??= new LoggerExternalScopeProvider();
-        return _scopeProvider;
-    }
+	private IExternalScopeProvider GetScopeProvider() {
+		this._scopeProvider ??= new LoggerExternalScopeProvider();
+		return this._scopeProvider;
+	}
 
-    private void ReloadOptions(ApplicationInsightsLoggerOptions options)
-    {
-        _options = options;
+	private void ReloadOptions(ApplicationInsightsLoggerOptions options) {
+		this._options = options;
 
 #pragma warning disable 618
-        _enrichmentCallback = options.EnrichCallback ?? delegate { };
+		this._enrichmentCallback = options.EnrichCallback ?? delegate { };
 #pragma warning restore 618
 
-        var scopeProvider = GetScopeProvider();
-        foreach (var logger in _loggers.Values)
-        {
-            logger.ScopeProvider = scopeProvider;
-            logger.IncludeCategoryName = options.IncludeCategoryName;
-            logger.IncludeScopes = options.IncludeScopes;
+		var scopeProvider = this.GetScopeProvider();
+		foreach (var logger in this._loggers.Values) {
+			logger.ScopeProvider = scopeProvider;
+			logger.IncludeCategoryName = options.IncludeCategoryName;
+			logger.IncludeScopes = options.IncludeScopes;
 
 #pragma warning disable 618
-            logger.EnrichmentCallback = _enrichmentCallback;
+			logger.EnrichmentCallback = this._enrichmentCallback;
 #pragma warning restore 618
-        }
-    }
+		}
+	}
 }

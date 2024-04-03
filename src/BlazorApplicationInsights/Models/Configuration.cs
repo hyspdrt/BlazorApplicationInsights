@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace BlazorApplicationInsights.Models;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
-namespace BlazorApplicationInsights.Models;
 
 /// <summary>
 /// Application Insights Configuration object

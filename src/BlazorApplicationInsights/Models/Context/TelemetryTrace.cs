@@ -1,11 +1,10 @@
-﻿using System;
+﻿namespace BlazorApplicationInsights.Models.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
-namespace BlazorApplicationInsights.Models.Context;
 
 /// <summary>
 /// Source: https://github.com/microsoft/ApplicationInsights-JS/blob/main/shared/AppInsightsCommon/src/Interfaces/Context/ITelemetryTrace.ts

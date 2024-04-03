@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿namespace BlazorApplicationInsights.Interfaces;
+using System.Threading.Tasks;
 using BlazorApplicationInsights.Models;
 using Microsoft.JSInterop;
-
-namespace BlazorApplicationInsights.Interfaces;
 
 /// <summary>
 /// Application Insights API

@@ -1,11 +1,11 @@
-﻿using BlazorApplicationInsights.Interfaces;
-using BlazorApplicationInsights.Models;
-using System;
-using System.Threading.Tasks;
-
-namespace BlazorApplicationInsights
+﻿namespace BlazorApplicationInsights
 {
-    internal class ApplicationInsightsInitConfig
+	using BlazorApplicationInsights.Interfaces;
+	using BlazorApplicationInsights.Models;
+	using System;
+	using System.Threading.Tasks;
+
+	internal class ApplicationInsightsInitConfig
     {
         public Config? Config { get; set; }
 

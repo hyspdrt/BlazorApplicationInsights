@@ -1,6 +1,5 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BlazorApplicationInsights.Models;
+﻿namespace BlazorApplicationInsights.Models;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Exception interface used as primary parameter to trackException
