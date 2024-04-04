@@ -45,8 +45,8 @@ public partial class ApplicationInsightsInit {
 		}
 
 		if (firstRender && this.IsWasmStandalone) {
+			// this is redundant since Blazor will auto load the {Assembly}.lib.module.js long before we get here...
 			//await this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorApplicationInsights/BlazorApplicationInsights.lib.module.js");
-
 			if (this.Config.Config != null) {
 				await this.ApplicationInsights.UpdateCfg(this.Config.Config, false);
 				await this.ApplicationInsights.TrackPageView();
