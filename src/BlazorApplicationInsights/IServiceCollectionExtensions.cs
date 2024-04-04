@@ -84,7 +84,7 @@ public static class IServiceCollectionExtensions {
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public ApplicationInsightsLoggerOptions Get(string? name) {
-			if (name != string.Empty) {
+			if (string.IsNullOrWhiteSpace(name)) {
 				return default!;
 			}
 			return this.CurrentValue;
